@@ -7,11 +7,13 @@ use SilverStripe\ORM\DataQuery;
 class FulltextBooleanRelevanceFilter extends FulltextBooleanFilter
 {
     protected $weight;
+    protected $alias;
 
-    public function __construct(?string $fullName = null, $value = false, array $modifiers = array(), int $weight = 1)
+    public function __construct(?string $fullName = null, $value = false, array $modifiers = array(), int $weight = 1, string $alias="")
     {
         parent::__construct($fullName, $value, $modifiers);
         $this->setWeight($weight);
+        $this->setAlias($alias);
     }
 
     protected function applyOne(DataQuery $query)
@@ -24,6 +26,12 @@ class FulltextBooleanRelevanceFilter extends FulltextBooleanFilter
         $select = $select . ' * ' . $weight;
         $query->selectField($select, $alias);
         return $query;
+    }
+
+    public function setAlias(string $alias)
+    {
+        $this->alias = $alias;
+        return $this;
     }
 
     public function setWeight(int $weight)
@@ -39,7 +47,11 @@ class FulltextBooleanRelevanceFilter extends FulltextBooleanFilter
 
     public function getRelevanceAlias()
     {
-        return $this->getName() . 'Relevance';
+        if($this->alias){
+            return $this->alias;
+        }else{
+            return $this->getName() . 'Relevance';
+        }
     }
 
     public function getScoreName()
